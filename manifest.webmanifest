@@ -1,1 +1,54 @@
-{"name":"Event Registration","short_name":"Event","start_url":"/","display":"standalone","background_color":"#faf3da","theme_color":"#203a6e","icons":[{"src":"/icon-192.png","sizes":"192x192","type":"image/png"},{"src":"/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}],"shortcuts":[{"name":"Register","url":"/register"},{"name":"Attendee portal","url":"/portal"}]}
+{
+ "id": "/",
+ "name": "Event Registration",
+ "short_name": "Event",
+ "description": "Register, get your flier and certificate.",
+ "start_url": "/",
+ "scope": "/",
+ "display": "standalone",
+ "display_override": [
+  "standalone",
+  "minimal-ui"
+ ],
+ "orientation": "any",
+ "categories": [
+  "events",
+  "productivity"
+ ],
+ "background_color": "#faf3da",
+ "theme_color": "#203a6e",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ],
+ "shortcuts": [
+  {
+   "name": "Register",
+   "url": "/register"
+  },
+  {
+   "name": "Attendee portal",
+   "url": "/portal"
+  },
+  {
+   "name": "Admin",
+   "url": "/admin"
+  }
+ ]
+}

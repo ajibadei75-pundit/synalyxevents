@@ -1,2 +1,3 @@
 const C='ev1';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin)return;const k=r.mode==='navigate'?'/index.html':r;e.respondWith(fetch(r).then(x=>{const c=x.clone();caches.open(C).then(s=>s.put(k,c));return x}).catch(()=>caches.match(k)))});
+self.addEventListener('notificationclick',e=>{e.notification.close();const u=e.notification.data?.url||'/';e.waitUntil(clients.matchAll({type:'window'}).then(l=>{for(const c of l)if('focus'in c)return c.navigate?c.navigate(u).then(x=>(x||c).focus()):c.focus();return clients.openWindow(u)}))});
