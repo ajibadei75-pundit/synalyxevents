@@ -7,7 +7,7 @@ create index if not exists attendees_created_idx on attendees(created_at desc);
 create or replace function is_admin() returns boolean language sql stable set search_path=public as
 $$ select lower(coalesce(auth.jwt()->>'email',''))='ajibadei75@gmail.com' $$;
 alter table attendees enable row level security; alter table settings enable row level security; alter table downloads_log enable row level security;
-create policy att_insert on attendees for insert to anon with check(data ? 'name' and data ? 'email' and not (data ? 'approved') and pg_column_size(data)<2000 and id=lower(data->>'email') and length(data->>'name')>1 and (data->>'email') ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$');
+create policy att_insert on attendees for insert to anon with check(data ? 'name' and data ? 'email' and not (data ? 'approved') and not (data ? 'access') and pg_column_size(data)<2000 and id=lower(data->>'email') and length(data->>'name')>1 and (data->>'email') ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$');
 create policy att_admin on attendees for all to authenticated using(is_admin()) with check(is_admin());
 -- flier and certificate templates are NOT public: they are served only through get_assets() to approved attendees
 create policy set_read on settings for select to anon,authenticated using(id not in ('flier','certificate'));
@@ -16,14 +16,17 @@ create policy dl_insert on downloads_log for insert to anon,authenticated with c
 create policy dl_admin on downloads_log for select to authenticated using(is_admin());
 create function check_email(e text) returns table(name text,approved boolean) language sql security definer set search_path=public as
 $$ select data->>'name',coalesce((data->>'approved')::boolean,false) from attendees where id=lower(trim(e)) $$;
+-- data.access = {"flier":bool,"certificate":bool}; missing means allowed. Admin sets it per attendee.
 create function get_assets(e text) returns jsonb language plpgsql security definer set search_path=public as $$
-declare a attendees; cert jsonb; fl jsonb;
+declare a attendees; cert jsonb; fl jsonb; acc jsonb; af boolean; ac boolean;
 begin
  select * into a from attendees where id=lower(trim(e));
  if not found or coalesce((a.data->>'approved')::boolean,false)=false then return null; end if;
- select data into fl from settings where id='flier'; select data into cert from settings where id='certificate';
- if coalesce((cert->>'released')::boolean,false)=false then cert:=null; end if;
- return jsonb_build_object('flier',fl,'certificate',cert);
+ acc:=coalesce(a.data->'access','{}'::jsonb);
+ af:=coalesce((acc->>'flier')::boolean,true); ac:=coalesce((acc->>'certificate')::boolean,true);
+ if af then select data into fl from settings where id='flier'; end if;
+ if ac then select data into cert from settings where id='certificate'; if coalesce((cert->>'released')::boolean,false)=false then cert:=null; end if; end if;
+ return jsonb_build_object('flier',fl,'certificate',cert,'access',jsonb_build_object('flier',af,'certificate',ac));
 end $$;
 create function seat_count() returns int language sql security definer set search_path=public as $$ select count(*)::int from attendees $$;
 revoke execute on function check_email(text),get_assets(text),seat_count() from public;
