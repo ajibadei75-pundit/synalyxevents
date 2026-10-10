@@ -18,7 +18,7 @@ Static site (`index.html`) + Supabase backend (already created and configured).
 2. Event tab: details, logo, colours, font. Save each card.
 3. Flier and Certificate tabs: upload templates, click/drag to place items, Save. Tick "Release certificates" when ready.
 4. Registration tab: copy the link or QR code and share it.
-5. Attendees tab: approve (single, selected, or all pending), then tick Flier and/or Certificate per attendee, or use "Apply access to selected" for groups (both, flier only, certificate only, none). Attendees open `/portal` with their email.
+5. Attendees tab: approve (single, selected, or all pending), then use the Access dropdown on each row (Flier + certificate, Flier only, Certificate only, No access), or "Set access for selected" for groups. Registration tab > default access sets what newly approved attendees receive. Attendees open `/portal` with their email.
 
 ## Security notes and limitations
 - Flier and certificate templates are not publicly readable; the server returns them only to approved attendees (certificate only when released).
